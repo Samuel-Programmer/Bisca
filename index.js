@@ -15,6 +15,7 @@ $(".start").click(function() {
     gameBoard = new Board();
     gameBoard.start("player1", "player2");
     d.dealDeck();
+    alert('Player' + (gameBoard.playerTurn + 1) + ' your turn to start');
 });
 
 
@@ -33,7 +34,7 @@ class Player {
         this.playerCard0 = 'placeHolder';
         this.playerCard1 = 'placeHolder';
         this.playerCard2 = 'placeHolder';
-        this.cardInPlay = []
+        this.cardInPlay = [];
         this.points = []
     }
 }
@@ -43,7 +44,7 @@ class Board {
         this.players = [];
         this.numberOfPlayers = 0;
         this.round = 0;
-        this.turn = 0;
+        this.turn = 1;
         this.playerTurn = 0
     }
 
@@ -74,11 +75,11 @@ class Board {
         }
 
         if (gameBoard.players[0].cardInPlay.value && gameBoard.players[1].cardInPlay.value){
-            gameBoard.score();
+            gameBoard.scoreTurn();
             for (let i = 0; i < gameBoard.numberOfPlayers; i ++) {
                 $("." + gameBoard.players[i].playerName + "inplay").removeClass(gameBoard.players[i].cardInPlay.suit + gameBoard.players[i].cardInPlay.rank)
             }
-            alert('Next Turn!');
+            alert('Player' + (gameBoard.playerTurn + 1) + ' your turn next');
             gameBoard.newTurn();
             d.dealDeck();
         }
@@ -88,19 +89,31 @@ class Board {
         for (let i = 0; i < gameBoard.numberOfPlayers; i ++) {
             gameBoard.players[i].cardInPlay = [];
         }
+
+        gameBoard.turn ++;
+
+        if (gameBoard.turn === 21){
+            gameBoard.scoreRound();
+        }
     }
 
-    score(){
+    scoreTurn(){
         let player1Score = parseInt(gameBoard.players[0].cardInPlay.value);
         let player2Score = parseInt(gameBoard.players[1].cardInPlay.value);
 
         if (player1Score > player2Score) {
             gameBoard.players[0].points.push(player1Score);
-            alert('Player1 Wins');
+            gameBoard.playerTurn = 0;
+            alert('Player1 Wins the turn');
         } else if (player2Score > player1Score) {
             gameBoard.players[1].points.push(player2Score);
-            alert('Player2 Wins');
+            gameBoard.playerTurn = 1;
+            alert('Player2 Wins the turn');
         }
+    }
+
+    scoreRound(){
+        alert('Who is the winner?!?!');
     }
 }
 
@@ -119,8 +132,8 @@ class Deck {
 
     createDeck() {
         let suit = ['clubs', 'spades', 'diamonds', 'hearts'];
-        let rank = ['ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'jack', 'queen', 'king'];
-        let value = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13'];
+        let rank = ['ace', '2', '3', '4', '5', '6', '7', 'jack', 'queen', 'king'];
+        let value = ['11', '0', '0', '0', '0', '0', '10', '3', '2', '4'];
 
         for (let i = 0; i < suit.length; i++) {
             for (let j = 0; j < rank.length; j++) {
@@ -150,8 +163,8 @@ class Deck {
                 let CardPlaceHolder = "." + gameBoard.players[i].playerName + "hand" + j;
                 // let cardClassID = gameBoard.players[i]['playerCard' + j].suit + gameBoard.players[i]['playerCard' + j].rank
                 // let cardClass = gameBoard.players[i]['playerCard' + j];
-                
-                if (gameBoard.players[i]['playerCard' + j] === 'placeHolder') {
+                console.log(gameBoard.turn)
+;                if (gameBoard.players[i]['playerCard' + j] === 'placeHolder' && gameBoard.turn <= 17) {
                     $(CardPlaceHolder).removeClass(gameBoard.players[i]['playerCard' + j].suit + gameBoard.players[i]['playerCard' + j].rank);
                     gameBoard.players[i]['playerCard' + j] = topCard;
                     $(CardPlaceHolder).addClass(gameBoard.players[i]['playerCard' + j].suit + gameBoard.players[i]['playerCard' + j].rank);
