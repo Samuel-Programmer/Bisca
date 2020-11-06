@@ -35,7 +35,8 @@ class Player {
         this.playerCard1 = 'placeHolder';
         this.playerCard2 = 'placeHolder';
         this.cardInPlay = [];
-        this.points = []
+        this.turnPoints = [];
+        this.roundPoints = 0
     }
 }
 
@@ -45,7 +46,8 @@ class Board {
         this.numberOfPlayers = 0;
         this.round = 0;
         this.turn = 1;
-        this.playerTurn = 0
+        this.playerTurn = 0;
+        this.roundTotals = []
     }
 
     start(playerOneName, playerTwoName) {
@@ -61,7 +63,6 @@ class Board {
         let turnCardPlcaeHolder = "." + gameBoard.players[gameBoard.playerTurn].playerName + "inplay";
         let handReference = (targetCard[2].slice(targetCard[2].length - 1, targetCard[2].length));
         let playerHandReference = 'playerCard' + handReference;
-
 
         $(turnCardPlcaeHolder).addClass(cardClass);
         targetCard.remove(cardClass);
@@ -102,18 +103,38 @@ class Board {
         let player2Score = parseInt(gameBoard.players[1].cardInPlay.value);
 
         if (player1Score > player2Score) {
-            gameBoard.players[0].points.push(player1Score);
+            gameBoard.players[0].turnPoints.push(player1Score);
             gameBoard.playerTurn = 0;
             alert('Player1 Wins the turn');
         } else if (player2Score > player1Score) {
-            gameBoard.players[1].points.push(player2Score);
+            gameBoard.players[1].turnPoints.push(player2Score);
             gameBoard.playerTurn = 1;
             alert('Player2 Wins the turn');
         }
     }
 
     scoreRound(){
-        alert('Who is the winner?!?!');
+        alert('Who is the round winner?!?!');
+
+        for (let i = 0; i < gameBoard.numberOfPlayers; i ++) {
+            var sum = (gameBoard.players[i].turnPoints).reduce(function(a, b){
+                return a + b;
+            }, 0);
+
+            gameBoard.roundTotals.push(sum);
+        }
+
+        let winningScore = Math.max(...(gameBoard.roundTotals));
+        let winningPlayerIndex = gameBoard.roundTotals.indexOf(winningScore);
+
+        alert(gameBoard.players[winningPlayerIndex].playerName + ' is the round winner');
+        gameBoard.players[winningPlayerIndex].roundPoints + 1;
+
+        if (gameBoard.players[winningPlayerIndex].roundPoints >= 3) {
+            alert(gameBoard.players[winningPlayerIndex].playerName + ' Wins the game!!!');
+        } else {
+            alert('Next round guys!');
+        }
     }
 }
 
@@ -163,8 +184,8 @@ class Deck {
                 let CardPlaceHolder = "." + gameBoard.players[i].playerName + "hand" + j;
                 // let cardClassID = gameBoard.players[i]['playerCard' + j].suit + gameBoard.players[i]['playerCard' + j].rank
                 // let cardClass = gameBoard.players[i]['playerCard' + j];
-                console.log(gameBoard.turn)
-;                if (gameBoard.players[i]['playerCard' + j] === 'placeHolder' && gameBoard.turn <= 17) {
+                
+                    if (gameBoard.players[i]['playerCard' + j] === 'placeHolder' && gameBoard.turn <= 17) {
                     $(CardPlaceHolder).removeClass(gameBoard.players[i]['playerCard' + j].suit + gameBoard.players[i]['playerCard' + j].rank);
                     gameBoard.players[i]['playerCard' + j] = topCard;
                     $(CardPlaceHolder).addClass(gameBoard.players[i]['playerCard' + j].suit + gameBoard.players[i]['playerCard' + j].rank);
